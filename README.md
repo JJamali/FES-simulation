@@ -5,9 +5,9 @@ BME355 Project.
 
 
 
-Jordan Jamali
-Rebecca Schuetze
-Zain-Ul-Abideen Altaf
-Sam Suys
-Ethan Gilmour
-Nishit Bheda
+Jordan Jamali \n
+Rebecca Schuetze \n
+Zain-Ul-Abideen Altaf \n
+Sam Suys \n
+Ethan Gilmour \n
+Nishit Bheda \n
