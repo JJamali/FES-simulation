@@ -1,5 +1,4 @@
-function instantaneous_pennation_angle (instantaneous_lm) 
-
+function [instantaneous_pa] = instantaneous_pennation_angle (instantaneous_lm) 
 
 % male 9.4 female 8.7
 resting_pennation_angle [8.7, 9.4];
