@@ -1,4 +1,4 @@
-function [normalize_PE_force] = force_length_parallel(lm)
+function [normalize_PE_force] = force_length_parallel(instantaneous_lm)
 
 % Input Parameter
 % lm: normalized length of muscle (contractile element)
