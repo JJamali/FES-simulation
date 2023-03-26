@@ -1,6 +1,8 @@
-function [outputArg1,outputArg2] = get_muscle_force(inputArg1,inputArg2)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+function force = get_muscle_force(a, lm, vm, pa)
+    global f_max force_length_regression force_velocity_regression
+    fl = feval(force_length_regression, lm);
+    fv = feval(force_velocity_regression, vm);
+    fp = force_length_parallel(lm);
+
+    force = f_max*(a*fl*fv + fp)*cosd(pa);
 end

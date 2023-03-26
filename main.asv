@@ -12,9 +12,8 @@ foot_mass = ;
 resting_pa = ;
 
 % Electrical stimulation input function
-global input_fun f_max
+global input_fun
 input_fun = define_input_function();
-f_max = 200;
 
 %% SETUP
 
@@ -24,7 +23,7 @@ knee_time_regression = get_knee_time_regression;
 hip_time_regression = get_hip_time_regression;
 
 global knee_height_regression leg_angle_regression
-[knee_height_regression,leg_angle_regression] = get_leg_trajectories(upper_leg_length, lower_leg_length, foot_length);
+[knee_height_regression,leg_angle_regression] = get_leg_trajectories(upper_leg_length,lower_leg_length);
 
 % Get resting lengths
 global resting_lm resting_lt
@@ -35,21 +34,22 @@ global force_length_regression force_velocity_regression
 force_length_regression = get_muscle_force_length_regression();
 force_velocity_regression = get_muscle_force_velocity_regression();
 
-global ta_origin_height ta_moment_arm
-ta_moment_arm = 0.04;
+global ta_origin_height
 ta_origin_height = sqrt(((5/6)*lower_leg_length)^2 - (0.04)^2);
 
 % From Buchanan et al, establishing activation function
-global activation_fun
+global activation_fun f_max
 A = -1.5; % Experimental parameter between -3 and 0
 activation_fun = @(u) (exp(A*u)-1)/(exp(A)-1);
+
+
 
 %% SIMULATION
 
 f = @(t,x) mechanics(t,x);
 
 tspan = [0 1];
-initial_conditions = [90,0,1];
+initial_conditions = get_initial_conditions();
 options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
 
 [t,y] = ode45(f,tspan,initial_conditions,options);
