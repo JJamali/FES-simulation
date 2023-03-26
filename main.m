@@ -13,7 +13,7 @@ resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = @(t) 0.1*cos(4*pi*t)+0.1;
+input_fun = @(t) 0.054;
 f_max = 200;
 
 %% SETUP
@@ -55,14 +55,15 @@ ankle_angle = y(:,1);
 
 for i = 1:length(t)
     leg_angle = polyval(leg_angle_regression,t(i));
-    toe_height(i) = foot_length*sind(leg_angle-ankle_angle(i));
+    toe_height(i) = polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
+        foot_length*sind(leg_angle-ankle_angle(i));
 end
 
 %polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
         
 %% PLOTS
 
-figure(6);
+figure(7);
 subplot(2,2,1);
 plot(t,toe_height);
 title("Toe height");

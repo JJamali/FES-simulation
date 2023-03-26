@@ -117,7 +117,7 @@ force = data(:,2);
 %end
    force_velocity_regression = polyfit(velocity,force,9); 
 
-   figure(5);
+   figure(6);
    subplot(1,2,1);
    plot(velocity,force);
    title("Unfitted force-velocity");
