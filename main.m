@@ -13,7 +13,7 @@ resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = @(t) 1-t;
+input_fun = @(t) 0.1*cos(4*pi*t)+0.1;
 f_max = 200;
 
 %% SETUP
@@ -24,7 +24,7 @@ global knee_height_regression leg_angle_regression
 
 % Get resting lengths
 global resting_lm resting_lt
-resting_lm = 0.5*lower_leg_length;
+resting_lm = 0.5*lower_leg_length/cosd(resting_pa);
 resting_lt = (1/3)*lower_leg_length;
 
 global force_length_regression force_velocity_regression
@@ -55,11 +55,11 @@ ankle_angle = y(:,1);
 
 for i = 1:length(t)
     leg_angle = polyval(leg_angle_regression,t(i));
-    toe_height(i) = polyval(knee_height_regression,t(i)) - ...
-        lower_leg_length*sind(leg_angle) + ...
-        foot_length*sind(leg_angle-ankle_angle(i));
+    toe_height(i) = foot_length*sind(leg_angle-ankle_angle(i));
 end
 
+%polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
+        
 %% PLOTS
 
 figure(6);
