@@ -58,6 +58,7 @@ data = [-0.9438202247191011, 0
 -0.05056179775280922, 0.7737704918032788
 -0.04775280898876422, 0.8
 -0.03932584269662942, 0.8262295081967215
+-0.03370786516853963, 0.8491803278688524
 -0.02528089887640461, 0.8721311475409834
 -0.016853932584269815, 0.8983606557377048
 -0.014044943820224809, 0.9262295081967212
@@ -99,8 +100,7 @@ data = [-0.9438202247191011, 0
 0.985955056179775, 1.401639344262295
 1.0224719101123594, 1.4032786885245903
 1.0617977528089886, 1.4049180327868853
-1.1011235955056178, 1.4065573770491804
--0.03370786516853963, 0.8491803278688524];
+1.1011235955056178, 1.4065573770491804];
 
 velocity = data(:,1);
 force = data(:,2);
@@ -108,12 +108,22 @@ force = data(:,2);
 % Ridge Regression
 % NOTE: this is different than TASK 2 of Question 1, follow the instruction
 % for TASK 2
-fun = @(x, mu, sigma) 1./(1+exp(-(x-mu)./sigma));
-X = [];
-for i = -1:0.2:-0.1
-    X = [X fun(velocity, i, 0.15)];
-end
-force_velocity_regression = ridge(force, X, 1, 0);
-end
+%fun = @(x, mu, sigma) 1./(1+exp(-(x-mu)./sigma));
+%X = [];
+%%%for i = -1:0.2:-0.1
+ %   X = [X fun(velocity, i, 0.15)];
+%end
+%force_velocity_regression = ridge(force, X, 1, 0);
+%end
+   force_velocity_regression = polyfit(velocity,force,9); 
 
+   figure(5);
+   subplot(1,2,1);
+   plot(velocity,force);
+   title("Unfitted force-velocity");
+   subplot(1,2,2);
+   plot(velocity,polyval(force_velocity_regression,velocity));
+   title("Fitted force-velocity")
+
+end
 % fv curve

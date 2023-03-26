@@ -153,8 +153,9 @@ data = [41.81818182 2.202365536
 67.03703704	43.16670983
 69.39393939	42.1712855
 70.57239057	49.10947078
-65.72390572	48.40628507
-];
+65.72390572	48.40628507];
+
+data = sortrows(data);
 
 % Input Parameters
 % data(:,1): samples of an independent variable (muscle length)
@@ -178,4 +179,11 @@ norm_data = [normalized_length, normalized_force];
 % Regression with "fit" function with "gauss2" option as model type
 force_length_regression = fit(norm_data(:,1), norm_data(:,2), 'gauss2');
 
+figure(4);
+subplot(1,2,1);
+plot(norm_data(:,1),norm_data(:,2));
+title("Unfitted force-length");
+subplot(1,2,2);
+plot(norm_data(:,1),feval(force_length_regression,norm_data(:,1)));
+title("Fitted force-length");
 end

@@ -1,6 +1,5 @@
 function knee_time_regression = get_knee_time_regression()
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+
 data = [51.176173493975895, 5.1084337349397515
 52.90625542168675, 6.843373493975918
 54.540568674698804, 8.771084337349393
@@ -34,5 +33,13 @@ data = [51.176173493975895, 5.1084337349397515
 
 time = (data(:,1)-50)./50;
 
-knee_time_regression = fit(time,data(:,2),'gauss2');
+knee_time_regression = polyfit(time,data(:,2),8);
+
+figure(2);
+subplot(1,2,1);
+plot(time, data(:,2));
+title("Unfitted knee angle");
+subplot(1,2,2);
+plot(time, polyval(knee_time_regression,time));
+title("Fitted knee angle");
 end

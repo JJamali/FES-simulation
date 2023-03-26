@@ -21,10 +21,10 @@ function [x_dot] = mechanics(t,x)
 
     norm_vm = get_muscle_velocity(activation, norm_lm, norm_lt, pennation_angle);
     
-    global ta_moment_arm;
+    global ta_moment_arm foot_length foot_mass;
     ta_torque = get_muscle_force(activation, norm_lm, norm_vm, pennation_angle)*ta_moment_arm;
 
-    angular_accel = 9.81*(foot_length/2)*cosd(feval(leg_angle_regression,t) - theta) - ta_torque/foot_mass;
+    angular_accel = 9.81*(foot_length/2)*cosd(polyval(leg_angle_regression,t) - theta) - ta_torque/foot_mass;
 
-    x_dot = [theta_dot,angular_accel,norm_vm];
+    x_dot = [theta_dot; angular_accel; norm_vm];
 end

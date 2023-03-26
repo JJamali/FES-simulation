@@ -5,24 +5,20 @@ clc
 
 % Anthropometric measurements
 global upper_leg_length lower_leg_length foot_length foot_mass resting_pa
-upper_leg_length = ;
-lower_leg_length = ;
-foot_length = ;
-foot_mass = ;
-resting_pa = ;
+upper_leg_length = 0.594;
+lower_leg_length = 0.455;
+foot_length = 0.267;
+foot_mass = 0.5;
+resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = define_input_function();
+input_fun = @(t) 1-t;
 f_max = 200;
 
 %% SETUP
 
 % Get trajectory regressions (create as global variables)
-global knee_time_regression hip_time_regression
-knee_time_regression = get_knee_time_regression;
-hip_time_regression = get_hip_time_regression;
-
 global knee_height_regression leg_angle_regression
 [knee_height_regression,leg_angle_regression] = get_leg_trajectories(upper_leg_length, lower_leg_length, foot_length);
 
@@ -58,12 +54,24 @@ ankle_angle = y(:,1);
 
 
 for i = 1:length(t)
-    leg_angle = feval(leg_angle_regression,t(i));
-    toe_height(i) = feval(knee_height_regression,t(i)) - ...
+    leg_angle = polyval(leg_angle_regression,t(i));
+    toe_height(i) = polyval(knee_height_regression,t(i)) - ...
         lower_leg_length*sind(leg_angle) + ...
         foot_length*sind(leg_angle-ankle_angle(i));
 end
 
 %% PLOTS
 
-plot_curves(t,x,toe_height);
+figure(6);
+subplot(2,2,1);
+plot(t,toe_height);
+title("Toe height");
+subplot(2,2,2);
+plot(t,y(:,1));
+title("Ankle angle");
+subplot(2,2,3);
+plot(t,y(:,2));
+title("Ankle angular velocity");
+subplot(2,2,4);
+plot(t,y(:,3));
+title("Normalized muscle length");
