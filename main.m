@@ -59,6 +59,9 @@ for i = 1:length(t)
         foot_length*sind(leg_angle-ankle_angle(i));
 end
 
+power = @(t) input_fun(t).*input_fun(t);
+TOTAL_POWER = integral(power, 1, 2, 'arrayvalued', true)
+
 %polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
         
 %% PLOTS
