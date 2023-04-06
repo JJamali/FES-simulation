@@ -113,9 +113,13 @@ figure(1);
 subplot(1,2,1);
 plot(time, data(:,2));
 title("Unfitted hip angle");
+xlabel("Time (s)");
+ylabel("Hip angle in degrees");
 subplot(1,2,2);
 plot(time, polyval(hip_time_regression,time));
 title("Fitted hip angle");
+xlabel("Time (s)");
+ylabel("Hip angle in degrees");
 end
 
 %{

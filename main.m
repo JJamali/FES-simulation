@@ -1,4 +1,5 @@
-clear
+clear all
+close all
 clc
 
 %% PARAMETERS
@@ -70,12 +71,20 @@ figure(7);
 subplot(2,2,1);
 plot(t,toe_height);
 title("Toe height");
+xlabel("Time (s)");
+ylabel("Height (m)");
 subplot(2,2,2);
 plot(t,y(:,1));
 title("Ankle angle");
+xlabel("Time (s)");
+ylabel("Angle (deg)");
 subplot(2,2,3);
 plot(t,y(:,2));
 title("Ankle angular velocity");
+xlabel("Time (s)");
+ylabel("Angular velocity (deg/s)");
 subplot(2,2,4);
 plot(t,y(:,3));
 title("Normalized muscle length");
+xlabel("Time (s)");
+ylabel("Normalized muscle length");

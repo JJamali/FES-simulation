@@ -26,6 +26,11 @@ function [knee_height_regression,leg_angle_regression] = get_leg_trajectories(up
     plot(swing_time,swing_leg_length);
     hold on
     plot(swing_time,other_leg_length);
+    legend('Leg in swing phase', 'Other leg');
+    title("Vertical component of leg length");
+    xlabel("Time (s)");
+    ylabel("Height (m)");
+
 
     knee_height_regression = polyfit(swing_time.',knee_height.',7);
     leg_angle_regression = polyfit(swing_time.',leg_angle.',7);
@@ -34,13 +39,21 @@ function [knee_height_regression,leg_angle_regression] = get_leg_trajectories(up
     subplot(2,2,1);
     plot(swing_time, knee_height);
     title("Unfitted knee height");
+    xlabel("Time (s)");
+    ylabel("Knee height (m)");
     subplot(2,2,2);
     plot(swing_time,polyval(knee_height_regression,swing_time));
     title("Fitted knee height");
+    xlabel("Time (s)");
+    ylabel("Knee height (m)");
     subplot(2,2,3);
     plot(swing_time, leg_angle);
     title("Unfitted leg angle");
+    xlabel("Time (s)");
+    ylabel("Lower leg angle in degrees");
     subplot(2,2,4);    
     plot(swing_time,polyval(leg_angle_regression,swing_time));
     title("Fitted leg angle");
+    xlabel("Time (s)");
+    ylabel("Lower leg angle in degrees");
 end

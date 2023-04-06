@@ -99,7 +99,11 @@ figure(2);
 subplot(1,2,1);
 plot(time, data(:,2));
 title("Unfitted knee angle");
+xlabel("Time (s)");
+ylabel("Knee angle in degrees");
 subplot(1,2,2);
 plot(time, polyval(knee_time_regression,time));
 title("Fitted knee angle");
+xlabel("Time (s)");
+ylabel("Knee angle in degrees");
 end
