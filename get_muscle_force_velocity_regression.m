@@ -117,13 +117,17 @@ force = data(:,2);
 %end
    force_velocity_regression = polyfit(velocity,force,9); 
 
-   figure(5);
+   figure(6);
    subplot(1,2,1);
    plot(velocity,force);
    title("Unfitted force-velocity");
+   xlabel("Normalized muscle velocity");
+   ylabel("Force scale factor");
    subplot(1,2,2);
    plot(velocity,polyval(force_velocity_regression,velocity));
-   title("Fitted force-velocity")
+   title("Fitted force-velocity");
+   xlabel("Normalized muscle velocity");
+   ylabel("Force scale factor");
 
 end
 % fv curve

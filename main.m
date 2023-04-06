@@ -1,4 +1,5 @@
-clear
+clear all
+close all
 clc
 
 %% PARAMETERS
@@ -13,7 +14,7 @@ resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = @(t) 0.1*cos(4*pi*t)+0.1;
+input_fun = @(t) 0.054;
 f_max = 200;
 
 %% SETUP
@@ -55,23 +56,35 @@ ankle_angle = y(:,1);
 
 for i = 1:length(t)
     leg_angle = polyval(leg_angle_regression,t(i));
-    toe_height(i) = foot_length*sind(leg_angle-ankle_angle(i));
+    toe_height(i) = polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
+        foot_length*sind(leg_angle-ankle_angle(i));
 end
+
+power = @(t) input_fun(t).*input_fun(t);
+TOTAL_POWER = integral(power, 1, 2, 'arrayvalued', true)
 
 %polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
         
 %% PLOTS
 
-figure(6);
+figure(7);
 subplot(2,2,1);
 plot(t,toe_height);
 title("Toe height");
+xlabel("Time (s)");
+ylabel("Height (m)");
 subplot(2,2,2);
 plot(t,y(:,1));
 title("Ankle angle");
+xlabel("Time (s)");
+ylabel("Angle (deg)");
 subplot(2,2,3);
 plot(t,y(:,2));
 title("Ankle angular velocity");
+xlabel("Time (s)");
+ylabel("Angular velocity (deg/s)");
 subplot(2,2,4);
 plot(t,y(:,3));
 title("Normalized muscle length");
+xlabel("Time (s)");
+ylabel("Normalized muscle length");

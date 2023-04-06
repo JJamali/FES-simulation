@@ -179,11 +179,15 @@ norm_data = [normalized_length, normalized_force];
 % Regression with "fit" function with "gauss2" option as model type
 force_length_regression = fit(norm_data(:,1), norm_data(:,2), 'gauss2');
 
-figure(4);
+figure(5);
 subplot(1,2,1);
 plot(norm_data(:,1),norm_data(:,2));
 title("Unfitted force-length");
+xlabel("Normalized muscle length");
+ylabel("Force scale factor");
 subplot(1,2,2);
 plot(norm_data(:,1),feval(force_length_regression,norm_data(:,1)));
 title("Fitted force-length");
+xlabel("Normalized muscle length");
+ylabel("Force scale factor");
 end

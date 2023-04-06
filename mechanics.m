@@ -26,7 +26,7 @@ function [x_dot] = mechanics(t,x)
 
     angular_accel = (180/pi)*(foot_mass*9.81*(foot_length/2)* ...
         cosd(polyval(leg_angle_regression,t) - theta) - ta_torque)/...
-        (foot_mass*(foot_length^2));
+        ((1/3)*foot_mass*(foot_length^2));
     
     x_dot = check_boundaries(theta, theta_dot, angular_accel, norm_lm, norm_vm);
 end
