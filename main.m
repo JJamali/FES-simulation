@@ -14,8 +14,14 @@ resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = @(t) 0.065-0.065*exp(-5*t);
 f_max = 200;
+
+global angle_error;
+angle_error = false;
+
+global optimized_power optimized_A
+optimized_B = 90;
+optimized_power = 1000;
 
 %% SETUP
 
@@ -41,50 +47,86 @@ global activation_fun
 A = -1.5; % Experimental parameter between -3 and 0
 activation_fun = @(u) (exp(A*u)-1)/(exp(A)-1);
 
-%% SIMULATION
 
-f = @(t,x) mechanics(t,x);
+ %% OPTIMIZATION 
+ 
+ B = linspace(0.03,0.05,21);
+ for j = 1:21
 
-tspan = [0 1];
-initial_conditions = [90,0,1];
-options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
+     input_fun = @(t) B(j);
 
-[t,y] = ode45(f,tspan,initial_conditions,options);
+    %% SIMULATION
+    disp("Angle_Error before simulation: " + angle_error);    
 
-ankle_angle = y(:,1);
+    f = @(t,x) mechanics(t,x);
+    %disp("Angle_Error at simulation: " + angle_error);  
+
+    tspan = [0 1];
+    initial_conditions = [90,0,1];
+    options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
+    
+    [t,y] = ode45(f,tspan,initial_conditions,options);
+
+    %disp("Angle_Error at simulation: " + angle_error);   
+    
+    ankle_angle = y(:,1);
+    
+    
+    for i = 1:length(t)
+        leg_angle = polyval(leg_angle_regression,t(i));
+        toe_height(i) = polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
+            foot_length*sind(leg_angle-ankle_angle(i));
+    end
+    
+    
+    %disp("Angle_Error Above power: " + angle_error);
 
 
-for i = 1:length(t)
-    leg_angle = polyval(leg_angle_regression,t(i));
-    toe_height(i) = polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
-        foot_length*sind(leg_angle-ankle_angle(i));
+    power = @(t) input_fun(t).*input_fun(t);
+    TOTAL_POWER = integral(power, 1, 2, 'arrayvalued', true)
+    
+    %polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
+    disp("Angle_Error: " + angle_error);
+
+    if toe_height(length(toe_height)) > 0 && angle_error == false
+        if optimized_power > TOTAL_POWER
+            optimized_power = TOTAL_POWER;
+            optimized_B = B(j);
+
+            disp("Time to plot!!")
+
+            %% PLOTS
+            figure(7);
+            subplot(2,2,1);
+            plot(t,toe_height(1:length(t)));
+            title("Toe height");
+            xlabel("Time (s)");
+            ylabel("Height (m)");
+            subplot(2,2,2);
+            plot(t,y(:,1));
+            title("Ankle angle");
+            xlabel("Time (s)");
+            ylabel("Angle (deg)");
+            subplot(2,2,3);
+            plot(t,y(:,2));
+            title("Ankle angular velocity");
+            xlabel("Time (s)");
+            ylabel("Angular velocity (deg/s)");
+            subplot(2,2,4);
+            plot(t,y(:,3));
+            title("Normalized muscle length");
+            xlabel("Time (s)");
+            ylabel("Normalized muscle length");
+
+        end
+    end
+    
+    %disp("Angle_Error: " + angle_error);
+    %disp("Optimized A: " + optimized_A);
+    %disp("Optimized Power: "+ optimized_power);
+
+    angle_error = false;
 end
 
-power = @(t) input_fun(t).*input_fun(t);
-TOTAL_POWER = integral(power, 1, 2, 'arrayvalued', true)
-
-%polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
-        
-%% PLOTS
-
-figure(7);
-subplot(2,2,1);
-plot(t,toe_height);
-title("Toe height");
-xlabel("Time (s)");
-ylabel("Height (m)");
-subplot(2,2,2);
-plot(t,y(:,1));
-title("Ankle angle");
-xlabel("Time (s)");
-ylabel("Angle (deg)");
-subplot(2,2,3);
-plot(t,y(:,2));
-title("Ankle angular velocity");
-xlabel("Time (s)");
-ylabel("Angular velocity (deg/s)");
-subplot(2,2,4);
-plot(t,y(:,3));
-title("Normalized muscle length");
-xlabel("Time (s)");
-ylabel("Normalized muscle length");
+disp("Optimized B: " + optimized_B);
+disp("Optimized Power: "+ optimized_power);
