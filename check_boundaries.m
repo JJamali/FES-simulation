@@ -6,10 +6,14 @@ function [x_dot] = check_boundaries(theta, theta_dot, angular_accel, lm, vm)
     end
     end
     
+    global angle_error
+
     if theta > 106.5
+        angle_error = true;
         theta_dot = min([theta_dot 0]);
         angular_accel = min([angular_accel 0]);
     else if theta < 55
+        angle_error = true;
         theta_dot = max([theta_dot 0]);
         angular_accel = max([angular_accel 0]);
     end
