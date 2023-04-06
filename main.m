@@ -14,7 +14,7 @@ resting_pa = 9.4;
 
 % Electrical stimulation input function
 global input_fun f_max
-input_fun = @(t) 0.054;
+input_fun = @(t) 0.065-0.065*exp(-5*t);
 f_max = 200;
 
 %% SETUP

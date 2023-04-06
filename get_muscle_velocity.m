@@ -30,9 +30,10 @@ function [vm] = get_muscle_velocity(a, lm, lt, pa)
             fv = polyval(force_velocity_regression, 1);
         end
 
-        force_velocity_regression(length(force_velocity_regression)) = ...
+        this_regression = force_velocity_regression;
+        this_regression(length(force_velocity_regression)) = ...
             force_velocity_regression(length(force_velocity_regression)) - fv;
-        roos = roots(force_velocity_regression);
+        roos = roots(this_regression);
         num_real_roots = 0;
         for i = 1:length(roos)
             if isreal(roos(i)) && roos(i) >= -1 && roos(i) <= 1
