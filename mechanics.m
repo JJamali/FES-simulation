@@ -1,5 +1,5 @@
 function [x_dot] = mechanics(t,x)
-    global leg_angle_regression knee_height_regression
+    global leg_angle_regression 
 
     theta = x(1);
     theta_dot = x(2);
@@ -15,15 +15,13 @@ function [x_dot] = mechanics(t,x)
     lt = mtu_length - lm*cosd(pennation_angle);
     norm_lt = lt/resting_lt;
 
-    global input_fun activation_fun
-    u = feval(input_fun, t);
-    activation = feval(activation_fun, u);
+    global activation_fun excitation
+    activation = feval(activation_fun, excitation);
 
     norm_vm = get_muscle_velocity(activation, norm_lm, norm_lt, pennation_angle);
-    
-    global ta_moment_arm foot_length foot_mass;
-    ta_torque = get_muscle_force(activation, norm_lm, norm_vm, pennation_angle)*ta_moment_arm;
 
+    global ta_moment_arm foot_length foot_mass
+    ta_torque = get_muscle_force(activation,norm_lm,norm_vm,pennation_angle)*ta_moment_arm;    
     angular_accel = (180/pi)*(foot_mass*9.81*(foot_length/2)* ...
         cosd(polyval(leg_angle_regression,t) - theta) - ta_torque)/...
         (foot_mass*(foot_length^2));

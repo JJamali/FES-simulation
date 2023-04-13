@@ -1,10 +1,10 @@
 function [instantaneous_pa] = instantaneous_pennation_angle (instantaneous_lm) 
 
-    global resting_pa
+    global resting_ne_pa
 
-    numerator = (1.47/0.47)*cosd(resting_pa)*sind(atand(0.47*tand(resting_pa)));
+    numerator = (1.47/0.47)*cosd(resting_ne_pa)*sind(atand(0.47*tand(resting_ne_pa)));
 
-    instantaneous_pa = 180 - atand(0.47*tand(resting_pa)) - (180 - asind(numerator/instantaneous_lm));
+    instantaneous_pa = 180 - atand(0.47*tand(resting_ne_pa)) - (180 - asind(numerator/instantaneous_lm));
     
     
 end
