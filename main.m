@@ -21,7 +21,7 @@ global angle_error angle_too_low
 angle_error = false;
 angle_too_low = false;
 
-optimal_power = 1000;
+optimal_of = 1000;
 optimal_u = 0;
 optimal_freq = 0;
 
@@ -65,6 +65,7 @@ activation_fun = @(u) (exp(A*u)-1)/(exp(A)-1);
 
 
 %% OPTIMIZATION
+num_solutions = 0;
 for u = linspace(u_threshold, u_saturation, u_steps)
     for freq = linspace(0, freq_cf, freq_steps)
     
@@ -107,8 +108,12 @@ for u = linspace(u_threshold, u_saturation, u_steps)
             foot_length*sind(final_leg_angle-final_ankle_angle);
 
         if final_toe_height > 0 && angle_error == false
-            if optimal_power > power
-                optimal_power = power;
+            num_solutions = num_solutions + 1;
+            functional_solutions(num_solutions,:) = [power, final_toe_height];
+
+            objective_function = 0.12*final_toe_height + power;
+            if optimal_of > power
+                optimal_solution_index = num_solutions;
                 optimal_u = u;
                 optimal_freq = freq;
 
@@ -177,4 +182,13 @@ for u = linspace(u_threshold, u_saturation, u_steps)
         end
     end
 end
+
+figure(9);
+scatter(functional_solutions(:,1), functional_solutions(:,2), 'b');
+hold on
+scatter(functional_solutions(optimal_solution_index,1), functional_solutions(optimal_solution_index,2), 'r');
+title("Functional Solutions, Final Angle Deviation vs. Power Consumption");
+xlabel("Power");
+ylabel("Final Ankle Angle Error");
+
 
