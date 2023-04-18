@@ -6,22 +6,33 @@ clc
 
 % Anthropometric measurements
 global upper_leg_length lower_leg_length foot_length foot_mass resting_ne_pa
-upper_leg_length = 0.594;
-lower_leg_length = 0.455;
-foot_length = 0.267;
-foot_mass = 0.5;
-resting_ne_pa = 9.4;
-mvc_ne_pa = 14.3;
 
-% Electrical stimulation input function
+% Male values
+upper_leg_length = 0.594; 
+lower_leg_length = 0.455; 
+foot_length = 0.267; 
+foot_mass = 0.5; 
+resting_ne_pa = 9.4; % Pennation angle at neutral position, resting 
+mvc_ne_pa = 14.3; % Pennation angle at neutral position, MVC
+
+% Female values
+%upper_leg_length = 0.386;
+%lower_leg_length = 0.368;
+%foot_length = 0.198;
+%foot_mass = 0.5;
+%resting_ne_pa = 8.7;
+
+% Maximum force from Henderson et al
 global f_max
 f_max = 200;
 
+% Error tracking variables
 global angle_error angle_too_low
 angle_error = false;
 angle_too_low = false;
 
-optimal_of = 1000;
+% Optimization results tracking variables
+optimal_of = 1000; % Arbitrarily high initial value
 optimal_u = 0;
 optimal_freq = 0;
 
@@ -30,11 +41,15 @@ optimal_freq = 0;
 % FES voltage parameters
 u_threshold = 30;
 u_saturation = 45;
-u_steps = 10;
+u_steps = 30;
+u_min = 42.5;
+u_max = 43.5;
 
 % FES frequency parameters
 freq_cf = 20;
-freq_steps = 10;
+freq_steps = 30;
+freq_min = 1.5; %0; 
+freq_max = 2.5; %20;
 
 % FES pulse width parameter
 pulse_width = 0.0001;
@@ -50,6 +65,7 @@ global resting_lm resting_lt
 resting_lm = 0.5*lower_leg_length/cosd(resting_ne_pa);
 resting_lt = (1/3)*lower_leg_length;
 
+% Get muscle force-length and force-velocity curves
 global force_length_regression force_velocity_regression
 force_length_regression = get_muscle_force_length_regression();
 force_velocity_regression = get_muscle_force_velocity_regression();
@@ -66,41 +82,38 @@ activation_fun = @(u) (exp(A*u)-1)/(exp(A)-1);
 
 %% OPTIMIZATION
 num_solutions = 0;
-for u = linspace(u_threshold, u_saturation, u_steps)
-    for freq = linspace(0, freq_cf, freq_steps)
+for u = linspace(u_min, u_max, u_steps) % Iterate through amplitude range
+    for freq = linspace(freq_min, freq_max, freq_steps) % Frequency range
     
         toe_height = [];
         pennation_angle = [];
+
+        % Calculating excitation from FES parameters
         global excitation
         excitation = get_excitation(u, freq, u_threshold, u_saturation, freq_cf);
     
         %% SIMULATION  
     
-        f = @(t,x) mechanics(t,x);
-        %disp("Angle_Error at simulation: " + angle_error);  
+        f = @(t,x) mechanics(t,x); 
     
         tspan = [0 1];
         initial_conditions = [90,0,1];
-        options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8);
+        % Event aborts simulation if angle caps out
+        % check_angle_error at the end of this file
+        options = odeset('RelTol', 1e-6, 'AbsTol', 1e-8, "Events", @(t,x) check_angle_error(t,x));
         
         tic
 
         [t,y] = ode45(f,tspan,initial_conditions,options);
     
         toc
-
-        %disp("Angle_Error at simulation: " + angle_error);   
         
         % Stimulation function is a biphasic square wave, meaning positive
         % and then negative pulse of stated amplitude with given pulse
         % width
-        power = 2*freq*(u^2)*pulse_width;
-        
-        %disp("Angle_Error Above power: " + angle_error);
+        er = 2*freq*(u^2)*pulse_width;
     
-        
-        %polyval(knee_height_regression,t(i)) - lower_leg_length*sind(leg_angle) + ...
-    
+        % Final toe height calculation
         final_leg_angle = polyval(leg_angle_regression, t(length(t)));
         final_knee_height = polyval(knee_height_regression, t(length(t)));
         final_ankle_angle = y(length(t),1);
@@ -108,14 +121,17 @@ for u = linspace(u_threshold, u_saturation, u_steps)
             foot_length*sind(final_leg_angle-final_ankle_angle);
 
         if final_toe_height > 0 && angle_error == false
+            % If solution is valid, add to functional solutions list
             num_solutions = num_solutions + 1;
-            functional_solutions(num_solutions,:) = [power, final_toe_height];
+            functional_solutions(num_solutions,:) = [er, abs(final_ankle_angle - 95), u, freq];
 
-            objective_function = 0.12*final_toe_height + power;
-            if optimal_of > power
+            % Calculate objective function result
+            objective_function = 0.12*abs( final_ankle_angle - 95 ) + er;
+            
+            if optimal_of > objective_function
+                % If it's the best solution so far, save it. 
+                optimal_of = objective_function;    
                 optimal_solution_index = num_solutions;
-                optimal_u = u;
-                optimal_freq = freq;
 
                 ankle_angle = y(:,1);
                 norm_lm = y(:,3);
@@ -174,8 +190,14 @@ for u = linspace(u_threshold, u_saturation, u_steps)
                 ylabel("Pennation angle (deg)");
             end
         end
-    
+        
+        % Reset angle error 
         angle_error = false;
+
+        % If angle gets too low, foot is dorsiflexing too much which means
+        % excitation is too high. This breaks from the inner for loop
+        % because it is pointless to check higher frequencies for the same
+        % amplitude if excitation is already too high.
         if angle_too_low 
             angle_too_low = false;
             break
@@ -183,12 +205,29 @@ for u = linspace(u_threshold, u_saturation, u_steps)
     end
 end
 
+%% All solutions plotting
 figure(9);
-scatter(functional_solutions(:,1), functional_solutions(:,2), 'b');
+scatter(functional_solutions(:,1), functional_solutions(:,2), 40, 'b', '.');
 hold on
-scatter(functional_solutions(optimal_solution_index,1), functional_solutions(optimal_solution_index,2), 'r');
-title("Functional Solutions, Final Angle Deviation vs. Power Consumption");
-xlabel("Power");
-ylabel("Final Ankle Angle Error");
+scatter(functional_solutions(optimal_solution_index,1), functional_solutions(optimal_solution_index,2), 100, 'r', '*');
+title("Functional Solutions, Final Angle Deviation vs. Energy-Resistance");
+xlabel("ER (J*Ohm)");
+ylabel("Final Ankle Angle Error (deg)");
 
+figure(10);
+scatter(functional_solutions(:,3), functional_solutions(:,4), 40, 'b', '.');
+hold on
+scatter(functional_solutions(optimal_solution_index,3), functional_solutions(optimal_solution_index,4), 100, 'r', '*');
+legend("Functional solutions", "Optimal solution")
+title("Functional Solutions, Frequency vs. Amplitude");
+xlabel("Amplitude (V)");
+ylabel("Frequency (Hz)");
 
+% Terminate simulation if ankle angle exceeds physiological limits,
+% breaking model.
+function [value, isterminal, direction] = check_angle_error(t,x)
+    global angle_error
+    value = angle_error;
+    isterminal = 1;
+    direction = 0;
+end

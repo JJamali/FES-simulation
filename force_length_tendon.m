@@ -1,4 +1,5 @@
 function [normalize_tendon_tension] = force_length_tendon(instantaneous_lt)
+% COPIED FROM ASSIGNMENT 2
 
 % Input Parameters
 % instantaneous_lt: normalized length of tendon (series elastic element)

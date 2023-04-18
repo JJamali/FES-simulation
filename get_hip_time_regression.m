@@ -1,6 +1,5 @@
 function hip_time_regression = get_hip_time_regression()
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+% Data from Gao et al
 data = [0.26086956521739957, 29.53370294718412
 1.5652173913043583, 29.28275459585643
 2.956521739130446, 29.167201634082286
@@ -105,21 +104,20 @@ data = [0.26086956521739957, 29.53370294718412
 98.69565217391306, 29.110008754012334
 100.26086956521742, 29.13101838342582];
 
-time = (data(:,1)-60)./40; % normalize between -1.5 to 1, we will only be taking values that are 60 to 100
+time = (data(:,1)-60)./40; % normalize time between -1.5 to 1, we will only be taking values that are 60 to 100
 
 hip_time_regression = polyfit(time,data(:,2),9);
 
+% Plot unfitted data and regression
 figure(1);
-subplot(1,2,1);
-plot(time, data(:,2));
-title("Unfitted hip angle");
+scatter(time, data(:,2), '.', 'r');
+hold on
+plot(time, polyval(hip_time_regression,time), 'b');
+title("Hip Angle vs. Time");
 xlabel("Time (s)");
 ylabel("Hip angle in degrees");
-subplot(1,2,2);
-plot(time, polyval(hip_time_regression,time));
-title("Fitted hip angle");
-xlabel("Time (s)");
-ylabel("Hip angle in degrees");
+lgd = legend("Unfitted data", "Polynomial fit");
+lgd.Location = "southeast";
 end
 
 %{

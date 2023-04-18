@@ -1,5 +1,6 @@
 function knee_time_regression = get_knee_time_regression()
 
+% Data from Gao et al
 data = [0.8928571428571423, 4.424778761061944
 1.7857142857142865, 5.13274336283186
 2.8571428571428577, 5.486725663716811
@@ -91,19 +92,19 @@ data = [0.8928571428571423, 4.424778761061944
 99.64285714285714, 3.716814159292042
 100.89285714285714, 2.3008849557522097];
 
-time = (data(:,1)-60)./40;
+time = (data(:,1)-60)./40; % Normalize time
 
 knee_time_regression = polyfit(time,data(:,2),9);
 
+% Plot unfitted data and regression
 figure(2);
-subplot(1,2,1);
-plot(time, data(:,2));
-title("Unfitted knee angle");
+scatter(time, data(:,2), '.', 'r');
+hold on
+plot(time, polyval(knee_time_regression,time), 'b');
+title("Knee Angle vs. Time");
 xlabel("Time (s)");
 ylabel("Knee angle in degrees");
-subplot(1,2,2);
-plot(time, polyval(knee_time_regression,time));
-title("Fitted knee angle");
-xlabel("Time (s)");
-ylabel("Knee angle in degrees");
+legend("Unfitted data", "Polynomial fit");
+
+
 end

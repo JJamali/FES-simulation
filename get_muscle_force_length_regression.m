@@ -1,5 +1,7 @@
 function [force_length_regression] = get_muscle_force_length_regression()
+% COPIED FROM ASSIGNMENT 2 (with small changes)
 
+% Data from Winters
 data = [41.81818182 2.202365536
 37.44107744	9.838556505
 38.45117845	14.72330139
@@ -157,13 +159,6 @@ data = [41.81818182 2.202365536
 
 data = sortrows(data);
 
-% Input Parameters
-% data(:,1): samples of an independent variable (muscle length)
-% data(:,2): corresponding samples of a dependent variable (tension)
-
-% Output
-% force_length_regression: the genered Gaussian model
-
 % Define data points by importing data and saving them to arrays
 muscle_length = data(:, 1);
 muscle_force = data(:, 2);
@@ -180,14 +175,11 @@ norm_data = [normalized_length, normalized_force];
 force_length_regression = fit(norm_data(:,1), norm_data(:,2), 'gauss2');
 
 figure(5);
-subplot(1,2,1);
-plot(norm_data(:,1),norm_data(:,2));
-title("Unfitted force-length");
+scatter(norm_data(:,1),norm_data(:,2),'.', 'r');
+hold on
+plot(norm_data(:,1),feval(force_length_regression,norm_data(:,1)), 'b');
+title("Muscle Force Scale Factor vs. Normalized Muscle Length");
 xlabel("Normalized muscle length");
 ylabel("Force scale factor");
-subplot(1,2,2);
-plot(norm_data(:,1),feval(force_length_regression,norm_data(:,1)));
-title("Fitted force-length");
-xlabel("Normalized muscle length");
-ylabel("Force scale factor");
+legend("Unfitted data", "Gaussian fit");
 end

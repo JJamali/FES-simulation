@@ -1,4 +1,8 @@
 function excitation = get_excitation(u, freq, u_threshold, u_saturation, freq_cf)
+    % All calculations come from Alonso and Watanabe. See Appendix A in
+    % report for full breakdown and methodology.
+
+    % Amplitude scaling factor
     if u < u_threshold
         S_u = 0;
     elseif u > u_saturation
@@ -14,7 +18,8 @@ function excitation = get_excitation(u, freq, u_threshold, u_saturation, freq_cf
     f0 = R*log((a2-1)*exp(freq_cf/R)-a2);
     a1 = -a2*exp(-f0/R);
 
+    % Frequency scaling factor
     S_f = (a1-a2)/(1+exp((freq-f0)/R))+a2;
 
-    excitation =S_u*S_f;
+    excitation = S_u*S_f;
 end

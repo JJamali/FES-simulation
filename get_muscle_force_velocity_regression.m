@@ -1,9 +1,6 @@
 function [force_velocity_regression] = get_muscle_force_velocity_regression()
-% 1D regression model with Gaussian basis functions.
-
-% Input Parameters
-% data(:,1): samples of an independent variable
-% data(:,2): corresponding samples of a dependent variable
+% Similar to assignment 2 but polynomial regression is used instead of
+% ridge regression.
 
 data = [-0.9438202247191011, 0
 -0.9157303370786517, 0.006557377049180468
@@ -118,16 +115,14 @@ force = data(:,2);
    force_velocity_regression = polyfit(velocity,force,9); 
 
    figure(6);
-   subplot(1,2,1);
-   plot(velocity,force);
-   title("Unfitted force-velocity");
+   scatter(velocity,force,'.', 'r');
+   hold on
+   plot(velocity,polyval(force_velocity_regression,velocity), 'b');
+   title("Muscle Force Scale Factor vs. Velocity");
    xlabel("Normalized muscle velocity");
    ylabel("Force scale factor");
-   subplot(1,2,2);
-   plot(velocity,polyval(force_velocity_regression,velocity));
-   title("Fitted force-velocity");
-   xlabel("Normalized muscle velocity");
-   ylabel("Force scale factor");
+   lgd = legend("Unfitted data", "Polynomial regression");
+   lgd.Location = "southeast";
 
 end
 % fv curve
